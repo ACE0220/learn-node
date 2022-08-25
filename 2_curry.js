@@ -24,7 +24,6 @@ fn(1)(2);
 
 // 柯里化可以让函数变得更加具体一些，反柯里化则让函数的范围更大
 function isType(val, typing) {
-    console.log(Object.prototype.toString.call(val));
     return Object.prototype.toString.call(val) === `[object ${typing}]`
 }
 
@@ -66,3 +65,32 @@ function sum(a, b, c, d) {
 let sumCurr = curring(sum);
 
 console.log(sumCurr(1)(2)(3)(4));
+
+// 复习函数柯里化
+
+function curring1(fn) {
+    const fnLen = fn.length;
+    const inner = (args = []) => {
+        return args.length >= fnLen ? fn(...args) : (...userArgs) => {
+            return inner([...args, ...userArgs]);
+        }
+    }
+    return inner();
+}
+
+function isType1(typing, val) {
+    return Object.prototype.toString.call(val) === `[object ${typing}]`
+}
+
+let isString1 = curring1(isType1)('String');
+console.log(isString1('abc'));
+
+
+// 多种类型判断
+
+let util = {};
+['String', 'Number', "Boolean", 'Null', 'Undefined'].forEach(type => {
+    util['is'+type] = curring(isType1)(type)
+})
+
+console.log(util.isString(123));
